@@ -18,35 +18,23 @@ namespace zeLaur.ShoppingCartDemo.ShoppingCart.Triggers
     public static class RemoveItemFromCart
     {
         [FunctionName("RemoveItemFromCart")]
-        public static async Task<HttpResponseMessage> RunAsync(
-            [HttpTrigger(AuthorizationLevel.Anonymous)] HttpRequestMessage req,
+        public static async Task<IActionResult> RunAsync(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "cart/{id}/remove")] HttpRequestMessage req,
+            Guid id,
             [DurableClient] IDurableClient client,  ILogger log)
         {
-            // log.LogInformation("C# HTTP trigger function processed a request.");
-            //
-            // string name = req.Query["name"];
-            //
-            // string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            // dynamic data = JsonConvert.DeserializeObject(requestBody);
-            // name = name ?? data?.name;
-            //
-            // return name != null
-            //     ? (ActionResult) new OkObjectResult($"Hello, {name}")
-            //     : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
 
-                var entityId = new EntityId(nameof(ShoppingCartEntity),"61283F9B-B3F6-4305-AED4-31573B10CF4A");
+            if (id == Guid.Empty)
+            {
+                return (ActionResult) new BadRequestObjectResult("Id is required");
+            }
+                var entityId = new EntityId(nameof(ShoppingCartEntity),id.ToString());
 
-                var cartItem = new CartItem
-                {
-                    ProductId = Guid.Parse("5D257F47-B4D2-4EF6-8E0F-16B8CA59281D"),
-                    Count = 1
-                };
+                var data = await req.Content.ReadAsAsync<CartItem>();
 
-                await client.SignalEntityAsync(entityId, "Remove", cartItem);
+                await client.SignalEntityAsync<IShoppingCart>(entityId, proxy => proxy.Remove(data));
 
-
-
-                return req.CreateResponse(HttpStatusCode.Accepted);
+                return (ActionResult) new AcceptedResult();
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using DurableTask.Core.Stats;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
@@ -12,20 +13,20 @@ using Task = System.Threading.Tasks.Task;
 namespace zeLaur.ShoppingCartDemo.ShoppingCart.Actors
 {
     [JsonObject(MemberSerialization.OptIn)]
-    public class ShoppingCartEntity
+    public class ShoppingCartEntity : IShoppingCart
     {
 
         [JsonProperty("list")]
-        private List<CartItem> List { get; set; } = new List<CartItem>();
+        private List<CartItem> list { get; set; } = new List<CartItem>();
 
         public void Add(CartItem item)
         {
             // Get existing
-            var existingItem = this.List.FirstOrDefault(i => i.ProductId == item.ProductId);
+            var existingItem = this.list.FirstOrDefault(i => i.ProductId == item.ProductId);
 
             if (existingItem == null)
             {
-                this.List.Add(item);
+                this.list.Add(item);
             }
             else
             {
@@ -35,7 +36,7 @@ namespace zeLaur.ShoppingCartDemo.ShoppingCart.Actors
 
         public void Remove(CartItem item)
         {
-            var existingItem = this.List.FirstOrDefault(i => i.ProductId == item.ProductId);
+            var existingItem = this.list.FirstOrDefault(i => i.ProductId == item.ProductId);
 
             if (existingItem == null)
             {
@@ -48,11 +49,14 @@ namespace zeLaur.ShoppingCartDemo.ShoppingCart.Actors
             }
             else
             {
-                this.List.Remove(existingItem);
+                this.list.Remove(existingItem);
             }
         }
 
-        public ReadOnlyCollection<CartItem> Cart => this.List.AsReadOnly();
+        public Task<ReadOnlyCollection<CartItem>> GetCartItems()
+        {
+            return Task.FromResult(this.list.AsReadOnly());
+        }
 
          [FunctionName(nameof(ShoppingCartEntity))]
          public static Task Run([EntityTrigger] IDurableEntityContext ctx)
