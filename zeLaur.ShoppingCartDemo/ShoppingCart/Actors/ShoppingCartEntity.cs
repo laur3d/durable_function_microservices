@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -61,11 +60,5 @@ namespace zeLaur.ShoppingCartDemo.ShoppingCart.Actors
          [FunctionName(nameof(ShoppingCartEntity))]
          public static Task Run([EntityTrigger] IDurableEntityContext ctx)
                 => ctx.DispatchAsync<ShoppingCartEntity>();
-    }
-
-    public class CartItem
-    {
-        public Guid ProductId { get; set; }
-        public int Count { get; set; }
     }
 }
