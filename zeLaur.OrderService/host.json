@@ -10,7 +10,7 @@
     },
     "extensions": {
         "durableTask": {
-            "hubName": "cartHub"
+            "hubName": "OrderHub"
         }
     }
 }
