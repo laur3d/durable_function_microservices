@@ -11,7 +11,8 @@ namespace zeLaur.OrderService
         public static void ConfigureServices(IServiceCollection builderServices, IConfiguration configuration)
         {
             builderServices.AddFeature(configuration)
-                .AddHttpClients(configuration);
+                .AddHttpClients()
+                .AddLogging();
 
         }
 
@@ -25,12 +26,11 @@ namespace zeLaur.OrderService
             return serviceCollection;
         }
 
-        private static IServiceCollection AddHttpClients(this IServiceCollection serviceCollection,
-            IConfiguration config)
+        private static IServiceCollection AddHttpClients(this IServiceCollection serviceCollection)
         {
             serviceCollection.AddHttpClient<IShoppingCartClient, ShoppingCartClient>((provider, client) =>
             {
-                // add the required headers
+                // add the required headers keys tokens and other specific http client stuff
                 var config = provider.GetService<AppConfig>();
 
                 client.BaseAddress = new Uri(config.CartServiceUrl);
