@@ -9,6 +9,8 @@
         CalculatingShipping,
         CalculatingFinalPrice,
         AwaitingPayment,
+        PaymentFailed,
+        PaymentSuccess,
         SendShippingOrder,
         Completed
     }

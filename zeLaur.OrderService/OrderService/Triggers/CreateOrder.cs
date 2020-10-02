@@ -30,7 +30,8 @@ namespace zeLaur.OrderService.OrderService.Triggers
             var started = await client.StartNewAsync(nameof(NewOrderOrchestrator), new StartOrderContext
             {
                 CorrelationId = Guid.NewGuid().ToString(),
-                ShoppingCartId = sessionId.ToString()
+                ShoppingCartId = sessionId.ToString(),
+                UserId = Guid.NewGuid().ToString() // this should be in the body of the post request, we will skipp it
             });
 
             return new AcceptedResult(started, started);

@@ -19,8 +19,6 @@ namespace zeLaur.OrderService.OrderService.OrderOrchestrator.PaymentSubOrchestra
             var input = context.GetInput<CalculateFinalCostActivity.FinalCost>();
 
             // here we need to call our payment provider
-            // but first we need to make a new GUID
-            var uniqueId = context.NewGuid();
 
             var timeout = TimeSpan.FromSeconds(60); // here we should have a bigger time window... but demo..
             var deadline = context.CurrentUtcDateTime.Add(timeout);
@@ -39,10 +37,10 @@ namespace zeLaur.OrderService.OrderService.OrderOrchestrator.PaymentSubOrchestra
                     OrchestratorInstanceId = context.InstanceId,
                 });
 
-
+            // wait for the winner - payed, not payed or timed out
             var winner = await Task.WhenAny(timeoutTask, paymentSuccess, paymentFail);
 
-            return winner == paymentFail;
+            return winner == paymentSuccess;
         }
     }
 }

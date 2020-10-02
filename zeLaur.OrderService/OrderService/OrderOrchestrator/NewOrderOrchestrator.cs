@@ -17,6 +17,8 @@ namespace zeLaur.OrderService.OrderService.OrderOrchestrator
             [OrchestrationTrigger] IDurableOrchestrationContext context,
             ExecutionContext executionContext)
         {
+            context.SetCustomStatus(OrderStatus.Starting.ToString());
+
             var inputData = context.GetInput<StartOrderContext>();
             inputData.UserId = context.NewGuid().ToString();
             // step one, get the cart
@@ -27,11 +29,13 @@ namespace zeLaur.OrderService.OrderService.OrderOrchestrator
                 new RetryOptions(TimeSpan.FromSeconds(5), 3),
                 Guid.Parse(inputData.ShoppingCartId));
 
-            context.SetCustomStatus(OrderStatus.ReservingProducts.ToString());
+            context.SetCustomStatus(OrderStatus.GettingAddress.ToString());
 
             var userData = await context.CallActivityWithRetryAsync<UserData>(nameof(GetUserDetailsActivity),
                 new RetryOptions(TimeSpan.FromSeconds(5), 3),
                 Guid.Parse(inputData.UserId));
+
+            context.SetCustomStatus(OrderStatus.ReservingProducts.ToString());
 
             var wareHouseStocksAvailableAndReserved = await context.CallActivityWithRetryAsync<CheckAndReserveItemsActivity.ReservationResult>(nameof(CheckAndReserveItemsActivity),
                 new RetryOptions(TimeSpan.FromSeconds(5), 3),
@@ -62,10 +66,21 @@ namespace zeLaur.OrderService.OrderService.OrderOrchestrator
 
             var paymentSuccess = await context.CallSubOrchestratorAsync<bool>(nameof(PaymentOrchestrator), finalCost);
 
-            context.SetCustomStatus(OrderStatus.SendShippingOrder.ToString());
+            if (paymentSuccess)
+            {
+                context.SetCustomStatus(OrderStatus.PaymentSuccess.ToString());
+                context.SetCustomStatus(OrderStatus.SendShippingOrder.ToString());
+                // we would have another one here ... but it the same as the the other interaction calls so we skip it :)
 
-            // we would have another one here ... but it the same as the the other interaction calls so we skip it :)
+            }
+            else
+            {
+                context.SetCustomStatus(OrderStatus.PaymentFailed.ToString());
+                // do whatever is required in this case ...
+            }
 
+
+            // finish the code
             context.SetCustomStatus(OrderStatus.Completed.ToString());
 
         }
