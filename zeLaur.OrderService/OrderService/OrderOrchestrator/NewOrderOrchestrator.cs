@@ -46,6 +46,8 @@ namespace zeLaur.OrderService.OrderService.OrderOrchestrator
                     UserData = userData
                 });
 
+            context.SetCustomStatus(OrderStatus.CalculatingFinalPrice.ToString());
+
             var finalCost = await context.CallActivityWithRetryAsync<CalculateFinalCostActivity.FinalCost>(nameof(CalculateFinalCostActivity),
                 new RetryOptions(TimeSpan.FromSeconds(5), 3),
                 new CalculateFinalCostActivity.ActivityTrigger{
@@ -60,9 +62,11 @@ namespace zeLaur.OrderService.OrderService.OrderOrchestrator
 
             var paymentSuccess = await context.CallSubOrchestratorAsync<bool>(nameof(PaymentOrchestrator), finalCost);
 
-            context.SetCustomStatus(OrderStatus.SendShippingOrder);
+            context.SetCustomStatus(OrderStatus.SendShippingOrder.ToString());
 
             // we would have another one here ... but it the same as the the other interaction calls so we skip it :)
+
+            context.SetCustomStatus(OrderStatus.Completed.ToString());
 
         }
     }

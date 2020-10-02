@@ -20,6 +20,7 @@ namespace zeLaur.OrderService.OrderService.OrderOrchestrator.PaymentSubOrchestra
         [FunctionName(nameof(StartPaymentProcessActivity))]
         public async Task Run([ActivityTrigger] ActivityTrigger input)
         {
+            Console.WriteLine($"InstanceID : {input.OrchestratorInstanceId}");
             _logger.LogCritical($"InstanceID : {input.OrchestratorInstanceId}");
 
             await Task.Delay(TimeSpan.FromSeconds(3));

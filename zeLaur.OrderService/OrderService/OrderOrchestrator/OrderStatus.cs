@@ -7,6 +7,7 @@
         GettingAddress,
         ReservingProducts,
         CalculatingShipping,
+        CalculatingFinalPrice,
         AwaitingPayment,
         SendShippingOrder,
         Completed

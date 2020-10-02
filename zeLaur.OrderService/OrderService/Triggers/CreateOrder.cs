@@ -33,7 +33,7 @@ namespace zeLaur.OrderService.OrderService.Triggers
                 ShoppingCartId = sessionId.ToString()
             });
 
-            return new AcceptedResult();
+            return new AcceptedResult(started, started);
         }
     }
 }
