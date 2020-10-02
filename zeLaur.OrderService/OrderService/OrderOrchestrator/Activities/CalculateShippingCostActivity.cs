@@ -31,7 +31,7 @@ namespace zeLaur.OrderService.OrderService.OrderOrchestrator.Activities
 
         public class ShippingCost
         {
-            // In real project, I'd suggest that you always use a Money ValueType
+            // In real project, I'd suggest that you always use a Money ValueObject
             public double Cost { get; set; }
             public string Currency { get; set; }
         }

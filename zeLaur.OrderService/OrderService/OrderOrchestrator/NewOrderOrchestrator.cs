@@ -76,6 +76,8 @@ namespace zeLaur.OrderService.OrderService.OrderOrchestrator
             else
             {
                 context.SetCustomStatus(OrderStatus.PaymentFailed.ToString());
+                // Maybe cancel the product reservation ....
+
                 // do whatever is required in this case ...
             }
 
